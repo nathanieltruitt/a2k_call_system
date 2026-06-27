@@ -3,13 +3,13 @@
  * La UI è in a2k-meet-ui.js (stesso plugin).
  */
 import { apiInitializer } from "discourse/lib/api";
-import MessageBus from "message-bus-client";
 import { ajax } from "discourse/lib/ajax";
 
 const LOG = (...args) => console.log("[a2k-meet glue]", ...args);
 
 apiInitializer("0.7", (api) => {
   const currentUser = api.getCurrentUser();
+  const messageBus = api.container.lookup("service:message-bus");
 
   window.A2kMeetAllowed = false;
   window.A2kMeetStatusLoaded = false;
@@ -68,7 +68,7 @@ apiInitializer("0.7", (api) => {
       );
     });
 
-  MessageBus.subscribe("/a2k-meet/signals", (data) => {
+  messageBus.subscribe("/a2k-meet/signals", (data) => {
     LOG("glue: MessageBus message received", data.signal_type, "from_user_id", data.from_user_id, "from_username", data.from_username);
     const payload = data.payload || {};
     const detail = {

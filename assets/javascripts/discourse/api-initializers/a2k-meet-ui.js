@@ -1,7 +1,6 @@
 import { apiInitializer } from "discourse/lib/api";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { ajax } from "discourse/lib/ajax";
-import MessageBus from "message-bus-client";
 
 /* Log e warn/error a2k-meet: attivi solo se Admin ha abilitato "Log di debug" in Impostazioni plugin oppure localStorage a2k_meet_debug === "1". */
 function a2kMeetDebugEnabled() {
@@ -86,6 +85,7 @@ function logError(...args) {
 
 export default apiInitializer("0.8", (api) => {
   log("a2k-meet-ui (plugin) initializer running");
+  const messageBus = api.container.lookup("service:message-bus");
 
   if (typeof window.A2kMeetSend !== "function") {
     window.A2kMeetSend = (data) => {
@@ -4213,7 +4213,7 @@ export default apiInitializer("0.8", (api) => {
   function subscribeMessageBus() {
     if (window.A2kMeetMessageBusSubscribed) return;
     window.A2kMeetMessageBusSubscribed = true;
-    MessageBus.subscribe("/a2k-meet/signals", (data) => {
+    messageBus.subscribe("/a2k-meet/signals", (data) => {
       log("[UI] MessageBus message received", data.signal_type, "from_user_id", data.from_user_id);
       const payload = data.payload || {};
       const detail = {
