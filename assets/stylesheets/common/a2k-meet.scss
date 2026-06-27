@@ -1,0 +1,3167 @@
+/* Desktop: blocca scroll pagina quando widget o UI chiamata è aperta (niente frecce/spostamento) */
+@media (min-width: 701px) {
+  body.a2k-meet-noscroll {
+    overflow: hidden;
+  }
+}
+
+/* iOS: fullscreen video "simulato" (Safari non supporta requestFullscreen su div): blocca body per coprire tutto lo schermo */
+body.a2k-meet-ios-fullscreen-fallback {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+  left: 0 !important;
+  top: 0 !important;
+}
+
+/* Animazione vortice: widget/UI aspirati verso il pulsante floating (solo desktop) */
+#a2k-meet-widget.a2k-meet-vortex-out,
+#a2k-meet-ui.a2k-meet-vortex-out,
+#a2k-meet-widget.a2k-meet-vortex-in,
+#a2k-meet-ui.a2k-meet-vortex-in {
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease-out;
+}
+
+/* --- FLOATING CALL BUTTON (stessi colori e animazione della UI telefonata) --- */
+#a2k-meet-btn {
+  position: fixed;
+  bottom: 190px;
+  right: 24px;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  background: radial-gradient(circle at top left, var(--a2k-meet-primary, #13c98c) 0%, var(--a2k-meet-primary-dark, #0f8f6a) 30%, #111827 70%, #020617 100%);
+  background-size: 200% 200%;
+  animation: a2k-meet-bg 8s ease-in-out infinite;
+  color: #fff;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--a2k-meet-primary, #13c98c);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  z-index: 9999;
+}
+
+#a2k-meet-btn .a2k-meet-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-bottom: 2px;
+}
+
+#a2k-meet-btn .a2k-meet-btn-icon svg {
+  width: 100%;
+  height: 100%;
+  color: inherit;
+}
+
+#a2k-meet-btn .a2k-meet-btn-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#a2k-meet-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 0 6px 20px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 40%, transparent);
+}
+
+#a2k-meet-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Incoming call: fast PULSE so the button is very noticeable */
+#a2k-meet-btn.a2k-meet-incoming {
+  animation: a2k-meet-pulse 0.55s ease-in-out infinite;
+}
+
+/* Chiamata attiva con UI nascosta: animazione soft per far riaprire la UI */
+#a2k-meet-btn.a2k-meet-active-hidden {
+  animation: a2k-meet-active-hidden-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes a2k-meet-active-hidden-pulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 35%, transparent), 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+}
+
+@keyframes a2k-meet-pulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 50%, transparent), 0 4px 12px rgba(0,0,0,0.25);
+    transform: scale(1.12);
+  }
+}
+
+/* --- CALL WIDGET (stesso stile e dimensioni della UI chiamata: sfondo dinamico + animazione) --- */
+/* Widget nascosto quando non .open: niente area cliccabile trasparente */
+#a2k-meet-widget:not(.open) {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+#a2k-meet-widget {
+  position: fixed;
+  bottom: 190px; /* same as #a2k-meet-btn */
+  right: 178px;  /* 24 + 58 + 96: button right + button width + 1 inch gap */
+  width: 360px;
+  min-height: 560px;
+  background: radial-gradient(circle at top left, var(--a2k-meet-primary, #13c98c) 0%, var(--a2k-meet-primary-dark, #0f8f6a) 30%, #111827 70%, #020617 100%);
+  background-size: 200% 200%;
+  animation: a2k-meet-bg 8s ease-in-out infinite;
+  border-radius: 14px;
+  padding: 20px;
+  padding-top: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  z-index: 99999;
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  box-sizing: border-box;
+  overflow: visible;
+  color: #ffffff;
+}
+
+#a2k-meet-widget.open {
+  display: flex !important;
+  flex-direction: column;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* Desktop: widget e call UI allargabili come finestre (resize) */
+@media (min-width: 701px) {
+  #a2k-meet-widget {
+    max-height: 85vh;
+  }
+  #a2k-meet-widget.open {
+    height: 85vh;
+    min-height: 560px;
+    min-width: 360px;
+    max-width: 90vw;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    resize: both;
+    overflow: auto;
+  }
+  #a2k-meet-widget .a2k-widget-page {
+    min-height: 0;
+  }
+  #a2k-meet-widget .a2k-widget-page:not(.a2k-widget-page-active) {
+    display: none !important;
+  }
+  #a2k-meet-widget .a2k-widget-page-home {
+    overflow-y: auto;
+  }
+  /* Pagina Notifications: contenuto dall'alto (no centratura), lista fino in fondo per i 10 record */
+  #a2k-meet-widget .a2k-widget-page-notifications.a2k-widget-page-active {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-notifications-header,
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-notifications-tabs,
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-footer {
+    flex-shrink: 0;
+  }
+  /* Desktop: lista notifiche arriva fino al footer; eventuali notifiche in più si vedono scrollando con il mouse */
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-history-list {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 45%, transparent) transparent;
+  }
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-history-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-history-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-history-list::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 40%, transparent);
+    border-radius: 3px;
+  }
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-history-list::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 65%, transparent);
+  }
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-history-list::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
+/* Tagline e testi: chiari su sfondo dinamico widget */
+#a2k-meet-widget .a2k-widget-tagline {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  margin: 0 0 18px 0;
+  line-height: 1.4;
+  padding: 0 4px;
+}
+.a2k-widget-tagline {
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+  margin: 0 0 18px 0;
+  line-height: 1.4;
+  padding: 0 4px;
+}
+
+.a2k-meet-input-wrap {
+  margin-bottom: 18px;
+}
+
+.a2k-meet-input-autocomplete-wrap {
+  position: relative;
+}
+
+.a2k-meet-suggestions {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 40%, transparent);
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.a2k-meet-suggestion-item {
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  transition: background 0.12s ease;
+}
+
+.a2k-meet-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.a2k-meet-suggestion-item:hover {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 12%, transparent);
+}
+
+/* Suggerimenti autocomplete nel widget: stesso stile/colore della call UI, testo bianco leggibile */
+#a2k-meet-widget .a2k-meet-suggestions,
+#a2k-meet-widget #a2k-meet-suggestions.a2k-meet-suggestions {
+  background: rgba(15, 23, 42, 0.98) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  color: #ffffff;
+}
+#a2k-meet-widget .a2k-meet-suggestion-item,
+#a2k-meet-widget #a2k-meet-suggestions .a2k-meet-suggestion-item {
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+#a2k-meet-widget .a2k-meet-suggestion-item:hover,
+#a2k-meet-widget #a2k-meet-suggestions .a2k-meet-suggestion-item:hover {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 35%, transparent);
+  color: #ffffff;
+}
+
+/* Widget top bar: come call UI (bordo chiaro su sfondo scuro) */
+#a2k-meet-widget .a2k-widget-brand-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin: -12px -20px 8px -20px;
+  padding: 6px 12px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: move;
+  user-select: none;
+}
+
+#a2k-meet-widget .a2k-widget-drag-handle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+#a2k-meet-widget .a2k-widget-brand-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--a2k-meet-primary, #13c98c);
+  line-height: 1.2;
+}
+
+#a2k-meet-widget .a2k-widget-brand-by {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 400;
+}
+
+/* Fallback se il widget non ha ancora lo sfondo dinamico (legacy) */
+.a2k-widget-brand-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin: -16px -16px 12px -16px;
+  padding: 8px 12px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  cursor: move;
+  user-select: none;
+}
+.a2k-widget-drag-handle { color: #666; font-size: 14px; }
+.a2k-widget-brand-title { font-size: 16px; font-weight: 700; color: var(--a2k-meet-primary, #13c98c); line-height: 1.2; }
+.a2k-widget-brand-by { font-size: 10px; color: #000; font-weight: 400; }
+
+/* Widget two-page layout */
+.a2k-widget-page {
+  display: none;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0; /* contenuti (es. Call) non escono dai margini */
+}
+
+.a2k-widget-page.a2k-widget-page-active {
+  display: flex;
+}
+
+/* Notifications header: stesso stile della call UI top bar (bordo, padding, colore) */
+.a2k-widget-notifications-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -12px -20px 10px -20px;
+  padding: 6px 12px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.a2k-widget-home-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9fafb;
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.a2k-widget-home-btn:hover {
+  background: #eee;
+}
+
+#a2k-meet-widget .a2k-widget-notifications-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--a2k-meet-primary, #13c98c);
+  margin: 0;
+}
+.a2k-widget-notifications-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.a2k-widget-history-list {
+  padding: 8px 0;
+  max-height: 240px;
+  overflow-y: auto;
+  min-height: 80px;
+}
+
+/* Mobile (verticale): tutto dentro la pagina, zoom sul widget non consentito (né double-tap né pinch) */
+@media (max-width: 700px) {
+  #a2k-meet-widget {
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    border-radius: 15px !important;
+    overflow: hidden !important;
+    padding: 12px 14px !important;
+    touch-action: manipulation; /* evita double-tap zoom; pinch bloccato da JS */
+    -ms-touch-action: manipulation;
+  }
+  /* Input almeno 16px su mobile per evitare zoom automatico iOS al focus */
+  #a2k-meet-widget #a2k-meet-input,
+  #a2k-meet-widget .a2k-meet-input-wrap input {
+    font-size: 16px !important;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  #a2k-meet-widget .a2k-meet-suggestions {
+    max-height: min(220px, 40vh);
+  }
+
+  /* Solo la pagina attiva è visibile e occupa lo spazio; l’altra resta nascosta (seconda pagina selezionabile da Notifications) */
+  #a2k-meet-widget .a2k-widget-page:not(.a2k-widget-page-active) {
+    display: none !important;
+  }
+  #a2k-meet-widget .a2k-widget-page.a2k-widget-page-active {
+    display: flex !important;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    flex-direction: column;
+  }
+
+  #a2k-meet-widget .a2k-widget-page-home {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 8px 0 16px 0;
+    overflow-x: visible;
+    overflow-y: auto;
+  }
+  #a2k-meet-widget .a2k-widget-home-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    min-height: 0;
+  }
+  #a2k-meet-widget .a2k-widget-page-home .a2k-widget-footer {
+    flex-shrink: 0;
+  }
+
+  #a2k-meet-widget .a2k-widget-page-home .a2k-widget-tagline {
+    margin: 0 0 8px 0;
+    font-size: 11px;
+  }
+
+  #a2k-meet-widget .a2k-widget-page-home .a2k-meet-input-wrap {
+    margin-bottom: 10px;
+  }
+
+  #a2k-meet-widget .a2k-widget-page-home .a2k-widget-status-label {
+    margin-top: 10px;
+  }
+
+  #a2k-meet-widget .a2k-widget-page-home .a2k-widget-status-btns {
+    margin-top: 6px;
+  }
+
+  #a2k-meet-widget .a2k-widget-page-home .a2k-widget-description {
+    margin: 8px 0 0 0;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  #a2k-meet-widget .a2k-widget-page-home .a2k-widget-footer {
+    margin-top: 10px;
+    flex-shrink: 0;
+  }
+
+  /* Notifications solo quando è la pagina attiva (come “cambio pagina”), non mostrare insieme alla home */
+  #a2k-meet-widget .a2k-widget-page-notifications.a2k-widget-page-active {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-history-list {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-notifications-header,
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-notifications-tabs,
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-footer {
+    flex-shrink: 0;
+  }
+
+  #a2k-meet-widget .a2k-widget-brand-bar {
+    margin: -12px -14px 10px -14px;
+    padding: 6px 10px 8px;
+  }
+  #a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-notifications-header {
+    margin: -12px -14px 10px -14px;
+    padding: 6px 10px 10px;
+  }
+
+  #a2k-meet-widget h3.a2k-widget-title {
+    font-size: 1.1rem;
+    margin: 0 0 4px 0;
+  }
+
+  /* Larger tap targets and stronger frosted effect on mobile */
+  #a2k-meet-widget .a2k-status-btn {
+    padding: 10px 12px;
+    font-size: 14px;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    min-height: 44px;
+  }
+  #a2k-meet-widget #a2k-meet-start {
+    padding: 14px;
+    font-size: 17px;
+    min-height: 48px;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+  #a2k-meet-widget .a2k-notifications-open-btn,
+  #a2k-meet-widget #a2k-meet-history-btn {
+    padding: 12px 14px;
+    min-height: 44px;
+    font-size: 15px;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+  #a2k-meet-widget .a2k-widget-hide-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    min-height: 44px;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+  #a2k-meet-widget .a2k-ntab {
+    padding: 10px 14px;
+    font-size: 13px;
+    min-height: 40px;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+  #a2k-meet-widget .a2k-widget-home-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+  #a2k-meet-widget .a2k-widget-back-btn {
+    width: auto;
+    min-width: 48px;
+    min-height: 48px;
+    height: auto;
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+  #a2k-meet-widget .a2k-widget-back-btn .a2k-widget-back-arrow {
+    font-size: 20px;
+  }
+}
+
+/* Notifications e Ringtones sulla stessa linea; Ringtones eredita le caratteristiche grafiche di Notifications */
+.a2k-widget-notifications-ringtones-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  margin-top: 16px;
+  width: 100%;
+}
+#a2k-meet-widget .a2k-widget-notifications-ringtones-row .a2k-notifications-open-btn,
+#a2k-meet-widget .a2k-widget-notifications-ringtones-row #a2k-meet-history-btn,
+#a2k-meet-widget .a2k-widget-notifications-ringtones-row .a2k-ringtones-toggle-btn {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0;
+  position: relative;
+  min-height: 44px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.45);
+  color: #fff;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+#a2k-meet-widget .a2k-widget-notifications-ringtones-row .a2k-notifications-open-btn:hover,
+#a2k-meet-widget .a2k-widget-notifications-ringtones-row #a2k-meet-history-btn:hover,
+#a2k-meet-widget .a2k-widget-notifications-ringtones-row .a2k-ringtones-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.a2k-notifications-open-btn {
+  margin-top: 16px;
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #f9fafb;
+  cursor: pointer;
+  position: relative;
+}
+
+#a2k-meet-widget .a2k-widget-description {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+  margin: 14px 0 0 0;
+  padding: 0 2px;
+}
+
+/* Pulsante Suonerie: quando da solo (non in riga), stile pieno; in riga con Notifications → stile unificato sopra */
+#a2k-meet-widget .a2k-ringtones-toggle-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+#a2k-meet-widget .a2k-ringtones-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Suonerie personalizzate (scelta + anteprima nel widget, visibile solo se si preme Ringtones) */
+.a2k-custom-ringtones-wrap {
+  margin-top: 12px;
+  padding: 10px 0 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+.a2k-custom-ringtones-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 8px;
+}
+.a2k-custom-ringtones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.a2k-custom-ringtones-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.a2k-custom-ringtones-row.selected {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 20%, transparent);
+  border-color: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 50%, transparent);
+}
+.a2k-custom-ringtones-label {
+  flex: 1;
+  font-size: 13px;
+  color: #ffffff;
+  min-width: 0;
+}
+.a2k-custom-ringtones-preview-btn,
+.a2k-custom-ringtones-select-btn {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.a2k-custom-ringtones-preview-btn:hover,
+.a2k-custom-ringtones-select-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+.a2k-custom-ringtones-select-btn {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 25%, transparent);
+  border-color: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 50%, transparent);
+}
+.a2k-custom-ringtones-select-btn:hover {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 40%, transparent);
+}
+.a2k-widget-description {
+  font-size: 11px;
+  color: #666;
+  line-height: 1.4;
+  margin: 14px 0 0 0;
+  padding: 0 2px;
+}
+
+.a2k-widget-footer {
+  margin-top: 18px;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.a2k-widget-hide-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #f3f4f6;
+  color: #333;
+  cursor: pointer;
+}
+
+.a2k-widget-hide-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Frosted blur style for widget buttons (desktop and mobile) */
+#a2k-meet-widget .a2k-status-btn {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+#a2k-meet-widget .a2k-status-btn:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+#a2k-meet-widget .a2k-status-btn.active {
+  font-weight: 700;
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 75%, transparent);
+  border-color: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 90%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+#a2k-meet-widget #a2k-status-busy.a2k-status-btn.active {
+  background: rgba(240, 173, 78, 0.8);
+  border-color: rgba(240, 173, 78, 0.9);
+}
+#a2k-meet-widget #a2k-status-not-available.a2k-status-btn.active {
+  background: rgba(217, 83, 79, 0.8);
+  border-color: rgba(217, 83, 79, 0.9);
+}
+
+#a2k-meet-widget #a2k-meet-start {
+  box-sizing: border-box;
+  max-width: 100%;
+  width: 100%;
+  min-width: 0; /* evita overflow in flex */
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+#a2k-meet-widget #a2k-meet-start .a2k-meet-widget-start-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+#a2k-meet-widget #a2k-meet-start .a2k-meet-widget-start-icon svg {
+  width: 26px;
+  height: 26px;
+}
+/* Hover: nessun allargamento, solo effetto interno (glow) */
+#a2k-meet-widget #a2k-meet-start:hover {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 95%, transparent);
+  transform: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 0 4px 16px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 40%, transparent);
+}
+#a2k-meet-widget #a2k-meet-start:active {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#a2k-meet-widget .a2k-notifications-open-btn,
+#a2k-meet-widget #a2k-meet-history-btn {
+  position: relative;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+#a2k-meet-widget .a2k-notifications-open-btn:hover,
+#a2k-meet-widget #a2k-meet-history-btn:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+#a2k-meet-widget .a2k-notifications-open-btn.a2k-notifications-has-unread,
+#a2k-meet-widget #a2k-meet-history-btn.a2k-notifications-has-unread {
+  animation: a2k-notifications-pulse 1.6s ease-in-out infinite;
+}
+@keyframes a2k-notifications-pulse {
+  0%, 100% {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 35%, transparent), 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Hide: stile verde + pulse; su PC staccato dal bordo in basso, scritta più leggibile */
+#a2k-meet-widget .a2k-widget-hide-btn {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 25%, transparent);
+  border: 1px solid color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 60%, transparent);
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 25%, transparent);
+  animation: a2k-hide-btn-pulse 1.8s ease-in-out infinite;
+}
+#a2k-meet-widget .a2k-widget-hide-btn:hover {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 40%, transparent);
+  border-color: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 80%, transparent);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 35%, transparent);
+}
+@keyframes a2k-hide-btn-pulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 25%, transparent);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 20%, transparent), 0 2px 8px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 25%, transparent);
+    opacity: 0.95;
+  }
+}
+
+/* Footer con Hide: staccato dal bordo in basso (desktop e mobile), scritta leggibile */
+#a2k-meet-widget .a2k-widget-footer {
+  padding-bottom: 14px;
+  margin-bottom: 0;
+}
+#a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-footer {
+  margin-top: 12px;
+  padding-bottom: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#a2k-meet-widget .a2k-widget-page-notifications .a2k-widget-hide-btn-notif {
+  margin-top: 0;
+}
+
+/* Tab Notifications: stile e animazione come call UI (vetro, verde attivo, transizione) */
+#a2k-meet-widget .a2k-notifications-tabs {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 0 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+#a2k-meet-widget .a2k-ntab {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, opacity 0.25s ease, transform 0.25s ease;
+  border-radius: 10px;
+}
+#a2k-meet-widget .a2k-ntab:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+#a2k-meet-widget .a2k-ntab.active {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 75%, transparent);
+  border-color: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 90%, transparent);
+  color: #ffffff;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  font-weight: 600;
+}
+#a2k-meet-widget .a2k-ntab:active {
+  transform: scale(0.98);
+}
+
+#a2k-meet-widget .a2k-widget-home-btn {
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+#a2k-meet-widget .a2k-widget-home-btn:hover {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+/* Pulsante Back in Notifications: sfondo con border-radius 15px (coerente con la UI) */
+#a2k-meet-widget .a2k-widget-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  min-width: 44px;
+  min-height: 44px;
+  height: auto;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  box-shadow: none;
+  border-radius: 15px;
+}
+#a2k-meet-widget .a2k-widget-back-btn .a2k-widget-back-arrow {
+  font-size: 18px;
+  line-height: 1;
+}
+#a2k-meet-widget .a2k-widget-back-btn .a2k-widget-back-label {
+  font-size: inherit;
+  white-space: nowrap;
+}
+#a2k-meet-widget .a2k-widget-back-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+#a2k-meet-widget .a2k-widget-back-btn:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+#a2k-meet-widget .a2k-widget-status-label {
+  margin-top: 16px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+.a2k-widget-status-label {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #555;
+}
+
+.a2k-widget-status-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+#a2k-meet-widget h3.a2k-widget-title {
+  margin: 0 0 14px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Input su sfondo dinamico widget: stile vetro */
+#a2k-meet-widget .a2k-meet-input-wrap {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+#a2k-meet-widget .a2k-meet-input-wrap input,
+#a2k-meet-widget #a2k-meet-input {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  border-radius: 8px;
+}
+#a2k-meet-widget #a2k-meet-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.a2k-meet-input-wrap {
+  position: relative;
+  border-radius: 10px;
+  padding: 0;
+  background: #fff;
+}
+
+.a2k-meet-input-wrap input,
+#a2k-meet-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #000;
+  margin: 0;
+  font-size: 15px;
+  background: #fff;
+  display: block;
+}
+
+#a2k-meet-start {
+  width: 100%;
+  padding: 10px;
+  background: var(--a2k-meet-primary, #13c98c);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+#a2k-meet-start:hover {
+  transform: none;
+}
+
+#a2k-meet-start:active {
+  transform: none;
+}
+
+#a2k-meet-widget #a2k-meet-error {
+  color: #ff8a80;
+  font-size: 14px;
+  margin-top: 6px;
+  display: none;
+}
+#a2k-meet-error {
+  color: #d9534f;
+  font-size: 14px;
+  margin-top: 6px;
+  display: none;
+}
+
+.a2k-status-btn {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #f3f4f6;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s ease, border 0.2s ease, color 0.2s ease;
+}
+
+.a2k-status-btn.active {
+  font-weight: 700;
+  color: #ffffff;
+}
+#a2k-status-available.a2k-status-btn.active {
+  background: var(--a2k-meet-primary, #13c98c);
+  border-color: var(--a2k-meet-primary, #13c98c);
+}
+#a2k-status-busy.a2k-status-btn.active {
+  background: #f0ad4e;
+  border-color: #f0ad4e;
+}
+#a2k-status-not-available.a2k-status-btn.active {
+  background: #d9534f;
+  border-color: #d9534f;
+}
+
+#a2k-meet-history-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #f9fafb;
+  cursor: pointer;
+  position: relative;
+}
+
+.a2k-notifications-badge {
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--a2k-meet-primary, #13c98c);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+  box-sizing: border-box;
+}
+#a2k-meet-widget .a2k-notifications-open-btn .a2k-notifications-badge,
+#a2k-meet-widget #a2k-meet-history-btn .a2k-notifications-badge {
+  right: 8px;
+}
+
+/* --- NOTIFICATIONS (inside widget, second page) --- */
+.a2k-notifications-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid #eee;
+  background: #f9fafb;
+}
+
+.a2k-ntab {
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.a2k-ntab:hover {
+  background: #f3f4f6;
+}
+
+.a2k-ntab.active {
+  background: var(--a2k-meet-primary, #13c98c);
+  border-color: var(--a2k-meet-primary, #13c98c);
+  color: #fff;
+}
+
+.a2k-history-empty {
+  padding: 20px;
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+}
+
+.a2k-history-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  transition: background 0.15s ease;
+}
+
+.a2k-history-item:hover {
+  background: #f3f4f6;
+}
+
+.a2k-history-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.a2k-history-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.a2k-history-username {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--a2k-meet-primary, #13c98c);
+  cursor: pointer;
+  text-align: left;
+  flex: 1;
+}
+
+.a2k-history-username:hover {
+  text-decoration: underline;
+}
+
+.a2k-history-meta {
+  font-size: 11px;
+  color: #666;
+  margin-top: 4px;
+  margin-left: 24px;
+}
+
+/* Lista notifiche: stile e colori come call UI (vetro, verde, transizione) */
+#a2k-meet-widget .a2k-history-empty {
+  color: rgba(255, 255, 255, 0.7);
+}
+#a2k-meet-widget .a2k-history-item {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background 0.2s ease, border-color 0.2s ease;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+#a2k-meet-widget .a2k-history-item:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+#a2k-meet-widget .a2k-history-meta {
+  color: rgba(255, 255, 255, 0.75);
+}
+#a2k-meet-widget .a2k-history-username {
+  color: var(--a2k-meet-primary, #13c98c);
+}
+#a2k-meet-widget .a2k-history-username:hover {
+  color: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 90%, transparent);
+}
+
+/* --- TOASTS --- */
+#a2k-meet-toasts {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: shake 0.35s ease;
+}
+
+/* --- CALL UI (DESKTOP PANEL): posizione e dimensioni da JS (come widget) --- */
+#a2k-meet-ui {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 260px;
+  right: 320px;
+  width: 320px;
+  min-height: 480px;
+  background: radial-gradient(circle at top left, var(--a2k-meet-primary, #13c98c) 0%, var(--a2k-meet-primary-dark, #0f8f6a) 30%, #111827 70%, #020617 100%);
+  background-size: 200% 200%;
+  animation: a2k-meet-bg 8s ease-in-out infinite;
+  border-radius: 14px;
+  padding: 20px;
+  padding-top: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  z-index: 99999;
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  color: #ffffff;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+/* Desktop: resizable like a window (min-width 701px), posizione da JS */
+@media (min-width: 701px) {
+  #a2k-meet-ui {
+    resize: both;
+    overflow: auto;
+    min-width: 360px;
+    min-height: 560px;
+    max-width: 90vw;
+    max-height: 85vh;
+  }
+}
+
+/* Top bar: al bordo iniziale della pagina (no margin-top negativo); brand A2K Meet */
+#a2k-meet-ui .call-top-bar {
+  display: flex;
+  align-items: center;
+  margin: 0 -20px 8px -20px;
+  padding: 6px 12px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: move;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+#a2k-meet-ui .call-drag-handle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+#a2k-meet-ui .call-top-bar-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--a2k-meet-primary, #13c98c);
+  line-height: 1.2;
+}
+
+@keyframes a2k-meet-bg {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+#a2k-meet-ui.open {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#a2k-meet-ui .call-drag-handle {
+  margin: 0;
+  padding: 0;
+  border: none;
+  text-align: left;
+  background: none;
+}
+
+/* Top bar sempre visibile anche su mobile (logo A2K Meet) */
+
+#a2k-meet-ui .call-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  justify-content: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Video call: remote full, local preview small bottom-right, mirror overlay, fullscreen (desktop) */
+#a2k-meet-ui .a2k-meet-video-wrap {
+  position: absolute;
+  inset: 0;
+  border-radius: 15px;
+  overflow: hidden;
+  background: #0d0d0d;
+}
+
+/* Desktop: video verticale (da smartphone) a schermo intero; solo top bar sopra; video in primo piano; controlli e anteprima in basso come su mobile */
+@media (min-width: 701px) {
+  #a2k-meet-ui.a2k-meet-video-active .call-inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  /* Video verticale: call-inner riempie lo spazio sotto la top bar così il video fill ha area piena */
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active:not(.a2k-meet-remote-video-landscape) {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active:not(.a2k-meet-remote-video-landscape) .call-top-bar {
+    flex-shrink: 0;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active:not(.a2k-meet-remote-video-landscape) .call-inner {
+    position: relative;
+    overflow: hidden;
+    flex: 1 1 0;
+    min-height: 0;
+    height: 100%;
+  }
+  /* Flusso video verticale in primo piano a tutto schermo (eccetto top bar) */
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active:not(.a2k-meet-remote-video-landscape) .a2k-meet-video-wrap {
+    position: absolute !important;
+    inset: 0 !important;
+    flex: none !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 15px;
+    z-index: 1;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active:not(.a2k-meet-remote-video-landscape) .a2k-meet-remote-video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+  /* Controlli in primo piano, stessa grafica di mobile (gradiente + blur) */
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active:not(.a2k-meet-remote-video-landscape) .a2k-meet-controls-block {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    margin: 0;
+    flex-shrink: 0;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active:not(.a2k-meet-remote-video-landscape) .a2k-meet-controls-block {
+    bottom: 0;
+    padding: 12px 12px 16px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.25));
+  }
+  /* Anteprima locale quasi attaccata alla barra controlli */
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active:not(.a2k-meet-remote-video-landscape) .a2k-meet-local-preview-outer {
+    bottom: 10px;
+    right: 12px;
+    z-index: 4;
+  }
+  /* Anteprima desktop: verticale (portrait) o orizzontale (landscape), dimensioni ridotte */
+  #a2k-meet-ui.a2k-meet-remote-video-portrait .a2k-meet-local-preview-wrap {
+    width: 72px;
+    height: 108px;
+  }
+  #a2k-meet-ui.a2k-meet-remote-video-landscape .a2k-meet-local-preview-wrap {
+    width: 108px;
+    height: 72px;
+  }
+  /* Video orizzontale desktop-desktop: rettangolo in alto, larghezza widget meno 2px per lato (si vede un minimo di sfondo) */
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-landscape:not(.a2k-meet-fullscreen-active) .a2k-meet-video-wrap {
+    position: relative;
+    inset: auto;
+    flex: 0 0 auto;
+    width: calc(100% - 4px);
+    margin: 0 2px;
+    height: 280px;
+    min-height: 200px;
+    max-height: 45vh;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d0d0d;
+  }
+  /* Controlli quasi attaccati al bordo in basso del widget (landscape, non fullscreen) */
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-landscape:not(.a2k-meet-fullscreen-active) .a2k-meet-controls-block {
+    flex-shrink: 0;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-landscape:not(.a2k-meet-fullscreen-active) .a2k-meet-local-preview-outer {
+    bottom: 6px;
+    right: 8px;
+  }
+  #a2k-meet-ui.a2k-meet-video-active .a2k-meet-local-preview-wrap {
+    width: 80px;
+    height: 112px;
+  }
+  /* Desktop fullscreen: layout a colonna così video e controlli non vanno in alto (portrait e landscape) */
+  #a2k-meet-ui.a2k-meet-fullscreen-active.a2k-meet-remote-video-active {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    overflow: hidden;
+    .call-top-bar {
+      flex-shrink: 0;
+    }
+    .call-inner {
+      position: relative;
+      overflow: hidden;
+      flex: 1 1 0 !important;
+      min-height: 0 !important;
+    }
+    .a2k-meet-video-wrap {
+      position: absolute !important;
+      inset: 0 !important;
+      flex: none !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      border-radius: 15px;
+      z-index: 0;
+    }
+    .a2k-meet-remote-video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover;
+      border-radius: 15px;
+    }
+    .a2k-meet-controls-block {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 3;
+      margin: 0;
+      flex-shrink: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.25));
+      padding: 12px 12px 16px;
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+    .a2k-meet-local-preview-outer {
+      z-index: 2;
+      bottom: 14px;
+    }
+  }
+
+  /* Fullscreen: wrap con overflow hidden così il video non esce mai dallo schermo quando lo smartphone ruota */
+  #a2k-meet-ui.a2k-meet-fullscreen-active.a2k-meet-remote-video-active .a2k-meet-video-wrap {
+    overflow: hidden;
+  }
+
+  /* Fullscreen + video verticale (da smartphone): video resta verticale al centro, spazio a sinistra/destra = sfondo animato come la UI */
+  #a2k-meet-ui.a2k-meet-fullscreen-active.a2k-meet-remote-video-active.a2k-meet-remote-video-portrait {
+    .a2k-meet-video-wrap {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 50%, #111827 0%, #0d0d0d 40%, #020617 100%);
+      background-size: 200% 200%;
+      animation: a2k-meet-bg 8s ease-in-out infinite;
+    }
+    .a2k-meet-remote-video {
+      width: auto !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      object-fit: contain !important;
+      border-radius: 15px;
+    }
+  }
+
+  /* Fullscreen + video orizzontale: centra il video nel wrap per evitare striscia nera in alto */
+  #a2k-meet-ui.a2k-meet-fullscreen-active.a2k-meet-remote-video-active.a2k-meet-remote-video-landscape .a2k-meet-video-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  #a2k-meet-ui.a2k-meet-fullscreen-active.a2k-meet-remote-video-active.a2k-meet-remote-video-landscape .a2k-meet-remote-video {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+  }
+  /* Solo nostro video (altro ha spento): wrap a tutta area, placeholder verde + tre punti al centro */
+  #a2k-meet-ui.a2k-meet-preview-only .a2k-meet-video-wrap {
+    position: absolute !important;
+    inset: 0 !important;
+    flex: none !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 15px;
+    background: transparent;
+  }
+  #a2k-meet-ui.a2k-meet-preview-only .a2k-meet-remote-video {
+    display: none !important;
+  }
+  #a2k-meet-ui.a2k-meet-preview-only .a2k-meet-fullscreen-btn {
+    display: none !important;
+  }
+}
+
+/* In videochiamata i pulsanti restano come in chiamata normale (anche su mobile) */
+#a2k-meet-ui.a2k-meet-video-active .controls,
+#a2k-meet-ui.a2k-meet-video-active .a2k-meet-controls-block {
+  flex-shrink: 0;
+}
+/* Pulsanti chiamata/videochiamata: stessa grandezza, blocco centrato su tutti i dispositivi */
+#a2k-meet-ui.a2k-meet-video-active .a2k-meet-controls-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+#a2k-meet-ui.a2k-meet-video-active .controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  max-width: 100%;
+}
+#a2k-meet-ui.a2k-meet-video-active .controls .btn {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  min-height: 52px;
+  max-width: 52px;
+  padding: 0;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+@media (max-width: 700px) {
+  #a2k-meet-ui.a2k-meet-video-active .controls .btn {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    min-height: 56px;
+    max-width: 56px;
+    font-size: 13px;
+  }
+  /* Mobile: tap immediato sui controlli (hangup, blur, ecc.) senza ritardo 300ms */
+  #a2k-meet-ui .a2k-meet-controls-block,
+  #a2k-meet-ui .a2k-meet-controls-block .controls,
+  #a2k-meet-ui .a2k-meet-controls-block .btn {
+    touch-action: manipulation;
+    pointer-events: auto;
+  }
+  #a2k-meet-ui .controls .btn.hangup {
+    min-width: 56px;
+    min-height: 56px;
+  }
+}
+
+/* Mobile: video remoto con contain; solo nostro video (altro spento) = wrap a tutta area, placeholder verde + tre punti */
+@media (max-width: 700px) {
+  #a2k-meet-ui.a2k-meet-video-active .a2k-meet-video-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #a2k-meet-ui.a2k-meet-preview-only .a2k-meet-video-wrap {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    background: transparent;
+    z-index: 0;
+  }
+  #a2k-meet-ui.a2k-meet-preview-only .a2k-meet-remote-video {
+    display: none !important;
+  }
+  #a2k-meet-ui.a2k-meet-preview-only .a2k-meet-fullscreen-btn {
+    display: none !important;
+  }
+  /* Preview-only su mobile: pulsanti (Nascondi, mute, hangup) sopra il video e cliccabili */
+  #a2k-meet-ui.a2k-meet-video-active:not(.a2k-meet-remote-video-active) .a2k-meet-controls-block {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+  #a2k-meet-ui.a2k-meet-video-active:not(.a2k-meet-remote-video-active) .a2k-meet-controls-block .controls,
+  #a2k-meet-ui.a2k-meet-video-active:not(.a2k-meet-remote-video-active) .a2k-meet-controls-block .btn,
+  #a2k-meet-ui.a2k-meet-video-active:not(.a2k-meet-remote-video-active) .a2k-meet-controls-block .a2k-meet-controls-toggle,
+  #a2k-meet-ui.a2k-meet-video-active:not(.a2k-meet-remote-video-active) .a2k-meet-controls-block .a2k-meet-controls-inner {
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+}
+
+#a2k-meet-ui .a2k-meet-remote-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 15px;
+}
+
+/* Popup: in videochiamata il tasto video mostra solo questo messaggio. ’*/
+#a2k-meet-ui .a2k-meet-video-disable-info {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
+  padding: 14px 18px;
+  background: rgba(15, 23, 42, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  &.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
+
+/* Popup "Video offuscato" vicino al tasto Blur quando attivato (5 secondi), border-radius 15px */
+#a2k-meet-ui .a2k-meet-blur-active-info {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  background: rgba(15, 23, 42, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 15px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  &.is-visible {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* Fade-in quando arriva il flusso video remoto */
+@keyframes a2k-remote-video-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+#a2k-meet-ui .a2k-meet-remote-video.a2k-meet-remote-video-fade-in {
+  animation: a2k-remote-video-fade-in 0.5s ease-out forwards;
+}
+
+/* Contenitore anteprima: sopra a tutti quando attiva, posizione iniziale in alto a sinistra (resettata a ogni videochiamata da JS) */
+/* Anteprima sempre sopra a tutti e in alto a sinistra in ogni modalità video */
+#a2k-meet-ui.a2k-meet-video-active .a2k-meet-local-preview-outer,
+#a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-local-preview-outer,
+#a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active:not(.a2k-meet-remote-video-landscape) .a2k-meet-local-preview-outer,
+#a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-landscape:not(.a2k-meet-fullscreen-active) .a2k-meet-local-preview-outer,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active .a2k-meet-local-preview-outer {
+  z-index: 100001 !important;
+  top: calc(8px + env(safe-area-inset-top, 0)) !important;
+  left: calc(8px + env(safe-area-inset-left, 0)) !important;
+  right: auto !important;
+  bottom: auto !important;
+  align-items: flex-start !important;
+}
+#a2k-meet-ui .a2k-meet-local-preview-outer {
+  position: absolute;
+  bottom: 14px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 2;
+}
+
+#a2k-meet-ui .a2k-meet-local-preview-wrap {
+  position: relative;
+  width: 72px;
+  height: 108px;
+  border-radius: 12px;
+  overflow: visible; /* permette al pulsante retrocamera (top: -10px) di restare visibile */
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  touch-action: none;
+}
+#a2k-meet-ui .a2k-meet-local-preview-wrap.a2k-local-preview-dragging {
+  cursor: grabbing;
+}
+#a2k-meet-ui .a2k-meet-local-preview-wrap .a2k-meet-local-preview {
+  border-radius: 12px;
+}
+
+/* Pulsante retrocamera: attaccato al bordo superiore centrale del video di anteprima (si sposta con l'anteprima) */
+#a2k-meet-ui .a2k-meet-switch-camera-btn {
+  display: none;
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 4;
+  box-sizing: border-box;
+}
+
+#a2k-meet-ui .a2k-meet-switch-camera-btn:hover {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 50%, transparent);
+}
+
+#a2k-meet-ui .a2k-meet-local-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Blur attivo: anteprima locale sfocata come il flusso inviato (Android/desktop) */
+#a2k-meet-ui .a2k-meet-local-preview.a2k-meet-preview-blurred {
+  filter: blur(12px);
+  transition: filter 0.2s ease;
+}
+
+/* Anteprima locale: trascinabile (grab), clic per mirror */
+#a2k-meet-ui .a2k-meet-local-preview-wrap {
+  cursor: grab;
+}
+
+#a2k-meet-ui .a2k-meet-mirror-toggle-icon {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  z-index: 3;
+  pointer-events: none;
+}
+
+#a2k-meet-ui .a2k-meet-mirror-toggle-icon.active {
+  color: var(--a2k-meet-primary, #13c98c);
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 35%, transparent);
+}
+
+#a2k-meet-ui .a2k-meet-fullscreen-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+#a2k-meet-ui .a2k-meet-fullscreen-btn:hover {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 40%, transparent);
+}
+
+/* Top bar e Ear mode restano sempre visibili. Nascondi avatar/username/status solo quando c'è video remoto (area grande) */
+#a2k-meet-ui.a2k-meet-remote-video-active .avatar,
+#a2k-meet-ui.a2k-meet-remote-video-active .username,
+#a2k-meet-ui.a2k-meet-remote-video-active .status,
+#a2k-meet-ui.a2k-meet-remote-video-active .a2k-meet-watermark,
+#a2k-meet-ui.a2k-meet-remote-video-active .duration {
+  display: none !important;
+}
+
+/* Video in ingresso verticale (portrait): riempie tutta la pagina del widget; controlli/mute in overlay sopra il video */
+#a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active.a2k-meet-remote-video-portrait {
+  .call-inner {
+    position: relative;
+    overflow: hidden;
+  }
+  .a2k-meet-video-wrap {
+    position: absolute !important;
+    inset: 0 !important;
+    flex: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 15px;
+    z-index: 0;
+  }
+  .a2k-meet-remote-video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: 15px;
+  }
+  .a2k-meet-controls-block {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    margin: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.25));
+    padding: 6px 12px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0));
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    pointer-events: auto;
+  }
+  .a2k-meet-controls-block .a2k-meet-controls-toggle,
+  .a2k-meet-controls-block .a2k-meet-controls-inner {
+    pointer-events: auto;
+  }
+  .a2k-meet-local-preview-outer {
+    z-index: 2;
+    bottom: 110px;
+  }
+  @media (max-width: 700px) {
+    .a2k-meet-local-preview-outer {
+      bottom: calc(110px + env(safe-area-inset-bottom, 0));
+    }
+    .a2k-meet-controls-toggle {
+      min-height: 44px;
+      padding: 10px 12px;
+      touch-action: manipulation;
+    }
+  }
+  .a2k-meet-fullscreen-btn {
+    z-index: 3;
+  }
+}
+
+#a2k-meet-ui .a2k-meet-controls-block {
+  width: 100%;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Voce cliccabile "Nascondi pulsanti" / "Mostra pulsanti": solo durante chiamata o videochiamata attiva (non in tentativo di chiamata) */
+#a2k-meet-ui .a2k-meet-controls-toggle {
+  display: none;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 4px 0 6px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  font-size: 12px;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-family: inherit;
+}
+
+#a2k-meet-ui .a2k-meet-controls-toggle:hover {
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: underline;
+}
+
+#a2k-meet-ui.a2k-meet-connected .a2k-meet-controls-toggle {
+  display: inline-block;
+}
+
+@media (max-width: 700px) {
+  #a2k-meet-ui .a2k-meet-controls-toggle {
+    padding: 6px 0 8px;
+    font-size: 13px;
+    min-height: 28px;
+    display: none;
+  }
+  #a2k-meet-ui.a2k-meet-connected .a2k-meet-controls-toggle {
+    display: inline-block;
+  }
+}
+
+#a2k-meet-ui .a2k-meet-controls-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease;
+  max-height: 120px;
+  overflow: hidden;
+}
+
+#a2k-meet-ui .a2k-meet-controls-block.a2k-meet-controls-hidden .a2k-meet-controls-inner {
+  opacity: 0;
+  transform: translateY(100%);
+  max-height: 0;
+  pointer-events: none;
+}
+
+/* Toggle "Nascondi pulsanti" solo durante chiamata/videochiamata attiva, mai in tentativo (incoming o outgoing) */
+#a2k-meet-ui.a2k-meet-incoming-ringing .a2k-meet-controls-toggle,
+#a2k-meet-ui.a2k-meet-outgoing-ringing .a2k-meet-controls-toggle {
+  display: none !important;
+}
+/* Blocco pulsanti (mute, speaker, hangup) centrato; pulsanti stessa grandezza in chiamata e videochiamata */
+#a2k-meet-ui:not(.a2k-meet-incoming-ringing) .a2k-meet-controls-block {
+  align-items: center;
+  justify-content: center;
+}
+#a2k-meet-ui:not(.a2k-meet-incoming-ringing) .controls {
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  max-width: 100%;
+}
+#a2k-meet-ui:not(.a2k-meet-incoming-ringing) .controls .btn {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  min-height: 52px;
+  max-width: 52px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+@media (max-width: 700px) {
+  #a2k-meet-ui:not(.a2k-meet-incoming-ringing) .controls .btn {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    min-height: 56px;
+    max-width: 56px;
+  }
+}
+/* Incoming call: show only Accept/Reject, hide Mute/Speaker/Hang up and Ear mode until accepted */
+#a2k-meet-ui.a2k-meet-incoming-ringing .a2k-meet-controls-block,
+#a2k-meet-ui.a2k-meet-incoming-ringing .ear-mode,
+#a2k-meet-ui.a2k-meet-incoming-ringing .a2k-meet-hide-ui-row {
+  display: none !important;
+}
+
+/* Riga "Nascondi e naviga" in fondo alla call UI (sotto controlli e ear mode) */
+#a2k-meet-ui .a2k-meet-hide-ui-row {
+  margin-top: auto;
+  padding: 12px 0 8px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#a2k-meet-ui .a2k-meet-hide-ui-btn {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+#a2k-meet-ui .a2k-meet-hide-ui-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+@media (min-width: 701px) {
+  #a2k-meet-ui .call-inner { justify-content: flex-start; }
+  #a2k-meet-ui .a2k-meet-controls-block { padding-top: 12px; }
+}
+
+/* Watermark: sotto "Calling...", in flow (non overlay) */
+#a2k-meet-ui .a2k-meet-watermark {
+  pointer-events: none;
+  opacity: 0.7;
+  margin: 8px 0 14px 0;
+}
+
+#a2k-meet-ui .a2k-meet-watermark-inner {
+  text-align: center;
+}
+
+#a2k-meet-ui .a2k-meet-watermark-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--a2k-meet-primary, #13c98c);
+  margin: 0 0 2px 0;
+}
+
+#a2k-meet-ui .a2k-meet-watermark-by {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.85);
+  margin: 0 0 4px 0;
+}
+
+#a2k-meet-ui .a2k-meet-watermark-slogan {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.9);
+  margin: 0;
+}
+
+#a2k-meet-ui .avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 15px;
+  margin-bottom: 16px;
+  background-size: cover;
+  background-position: center;
+  border: 3px solid rgba(255,255,255,0.25);
+}
+
+#a2k-meet-ui .username {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+#a2k-meet-ui .status {
+  font-size: 15px;
+  color: #d1d5db;
+  margin-bottom: 12px;
+}
+
+#a2k-meet-ui .duration {
+  font-size: 14px;
+  color: #9ca3af;
+  margin-bottom: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+#a2k-meet-ui .btn.mute.active {
+  text-decoration: line-through;
+  opacity: 0.9;
+}
+
+#a2k-meet-ui .incoming-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 700px) {
+  #a2k-meet-ui .incoming-row {
+    margin-top: auto;
+    margin-bottom: 12px;
+    padding-bottom: 0;
+  }
+  #a2k-meet-ui .incoming-row button {
+    padding: 12px 18px !important;
+    font-size: 17px !important;
+    min-height: 46px;
+    border-radius: 15px !important;
+    box-sizing: border-box;
+  }
+}
+
+#a2k-meet-ui .incoming-row {
+  gap: 12px;
+}
+
+#a2k-meet-ui .incoming-row button {
+  min-width: 52px;
+  min-height: 52px;
+  padding: 0;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+#a2k-meet-ui .incoming-row button:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+#a2k-meet-ui .incoming-row button:active {
+  transform: scale(0.96);
+}
+
+#a2k-meet-ui .a2k-meet-incoming-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+}
+
+#a2k-meet-ui .a2k-meet-incoming-icon svg {
+  width: 100%;
+  height: 100%;
+  color: inherit;
+}
+
+#a2k-meet-ui .controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Pulsanti chiamata: stile moderno (glass, ombre, transizioni) */
+#a2k-meet-ui .controls .btn {
+  flex: 0 0 auto;
+  padding: 0 14px;
+  min-width: 52px;
+  min-height: 52px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+#a2k-meet-ui .controls .btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+#a2k-meet-ui .controls .btn.hangup {
+  background: rgba(220, 53, 69, 0.85);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 2px 12px rgba(220, 53, 69, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#a2k-meet-ui .controls .btn.hangup:hover {
+  background: rgba(220, 53, 69, 0.95);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+#a2k-meet-ui .controls .btn.hangup .a2k-meet-hangup-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+#a2k-meet-ui .controls .btn.hangup .a2k-meet-hangup-icon svg {
+  width: 100%;
+  height: 100%;
+  color: inherit;
+}
+
+/* Icone controlli chiamata: dimensioni e stati mute/video */
+#a2k-meet-ui .controls .btn .a2k-meet-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+#a2k-meet-ui .controls .btn .a2k-meet-icon svg {
+  width: 100%;
+  height: 100%;
+  color: inherit;
+}
+
+#a2k-meet-ui .controls .btn.mute .a2k-meet-icon-mic-off,
+#a2k-meet-ui .controls .btn.mute.active .a2k-meet-icon-mic {
+  display: none;
+}
+
+#a2k-meet-ui .controls .btn.mute .a2k-meet-icon-mic,
+#a2k-meet-ui .controls .btn.mute.active .a2k-meet-icon-mic-off {
+  display: inline-flex;
+}
+
+/* Su mobile lo speaker non cambia uscita audio: il tasto apre solo il popup "usa i tasti volume"; nessuno stato attivo */
+#a2k-meet-ui .controls .btn.speaker.a2k-meet-speaker-mobile.active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Video: stessa icona videocamera in entrambi gli stati; differenza solo colore/evidenza (.active) */
+#a2k-meet-ui .controls .btn.video .a2k-meet-icon-video {
+  display: inline-flex;
+}
+#a2k-meet-ui .controls .btn.video:not(.active) .a2k-meet-icon-video {
+  opacity: 0.85;
+}
+#a2k-meet-ui .controls .btn.video.active .a2k-meet-icon-video {
+  opacity: 1;
+}
+
+#a2k-meet-ui .controls .btn.video.active {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 45%, rgba(255, 255, 255, 0.15));
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 12px rgba(19, 201, 140, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#a2k-meet-ui .controls .btn.blur .a2k-meet-icon-blur {
+  display: inline-flex;
+}
+#a2k-meet-ui .controls .btn.blur.active {
+  background: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 45%, rgba(255, 255, 255, 0.15));
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 12px rgba(19, 201, 140, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#a2k-meet-ui .controls .btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Ear mode: nascosto in videochiamata; in chiamata standard visibile a destra e a sinistra (solo mobile) */
+#a2k-meet-ui.a2k-meet-video-active .ear-mode {
+  display: none !important;
+}
+
+#a2k-meet-ui .ear-mode {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+#a2k-meet-ui .ear-mode.ear-mode-left {
+  right: auto;
+  left: 10px;
+}
+
+/* Mobile chiamata vocale: Ear mode trasparente (sfondo UI animato), stessa grandezza per entrambi i pulsanti */
+@media (max-width: 700px) {
+  #a2k-meet-ui:not(.a2k-meet-video-active) .ear-mode,
+  #a2k-meet-ui:not(.a2k-meet-video-active) .ear-mode.ear-mode-left {
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    min-width: 110px !important;
+    width: 110px !important;
+    max-width: 110px !important;
+    text-align: center !important;
+  }
+}
+
+#a2k-meet-ui .incoming-row button {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+#a2k-meet-ui .a2k-accept-btn {
+  background: rgba(34, 197, 94, 0.85);
+  box-shadow: 0 2px 12px rgba(34, 197, 94, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#a2k-meet-ui .a2k-accept-btn:hover {
+  background: rgba(34, 197, 94, 0.95);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+#a2k-meet-ui .a2k-reject-btn {
+  background: rgba(220, 53, 69, 0.85);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 2px 12px rgba(220, 53, 69, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#a2k-meet-ui .a2k-reject-btn:hover {
+  background: rgba(220, 53, 69, 0.95);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Ear mode: schermo praticamente spento, testo con illuminazione colore principale */
+#a2k-meet-proximity-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  z-index: 100002;
+  display: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#a2k-meet-proximity-overlay .a2k-meet-proximity-overlay-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+}
+#a2k-meet-proximity-overlay .a2k-meet-proximity-overlay-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+#a2k-meet-proximity-overlay .a2k-meet-proximity-overlay-logo {
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
+  font-weight: 700;
+  color: var(--a2k-meet-primary, #13c98c);
+}
+#a2k-meet-proximity-overlay .a2k-meet-proximity-overlay-by {
+  font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+  color: rgba(255, 255, 255, 0.7);
+}
+#a2k-meet-proximity-overlay .a2k-meet-proximity-overlay-slogan {
+  font-size: clamp(0.65rem, 2vw, 0.75rem);
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  margin-top: 0.15rem;
+}
+#a2k-meet-proximity-overlay .a2k-meet-proximity-overlay-title {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 700;
+  color: var(--a2k-meet-primary, #13c98c);
+  text-shadow: 0 0 20px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 80%, transparent),
+    0 0 40px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 50%, transparent),
+    0 0 60px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 30%, transparent);
+  line-height: 1.2;
+}
+#a2k-meet-proximity-overlay .a2k-meet-proximity-overlay-hint {
+  font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+  color: color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 90%, white);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 70%, transparent),
+    0 0 24px color-mix(in srgb, var(--a2k-meet-primary, #13c98c) 40%, transparent);
+  line-height: 1.4;
+  max-width: 280px;
+}
+
+@media (max-width: 700px) {
+  #a2k-meet-ui {
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    height: 100vh !important;
+    min-height: 100dvh !important;
+    min-height: 100vh !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    transform: translateY(100%) !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+    box-sizing: border-box !important;
+  }
+  /* iOS e Android: UI a tutta pagina (copre tutto il browser, non esce fuori), stesso layout */
+  #a2k-meet-ui.a2k-meet-ios,
+  #a2k-meet-ui.a2k-meet-android {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    height: 100vh !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+  }
+  #a2k-meet-ui.a2k-meet-ios .a2k-meet-controls-block,
+  #a2k-meet-ui.a2k-meet-ios .controls,
+  #a2k-meet-ui.a2k-meet-android .a2k-meet-controls-block,
+  #a2k-meet-ui.a2k-meet-android .controls {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0)) !important;
+  }
+  /* Video call portrait: pulsanti attaccati al fondo (no spazio extra) */
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-controls-block,
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-controls-block .controls {
+    padding-bottom: 0 !important;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-controls-block {
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0)) !important;
+  }
+  /* iOS: nascondi tasto Full Screen (in verticale è già a tutto schermo) */
+  #a2k-meet-ui.a2k-meet-ios .a2k-meet-fullscreen-btn {
+    display: none !important;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.open {
+    transform: translateY(0) !important;
+  }
+
+  #a2k-meet-ui.open {
+    transform: translateY(0) !important;
+  }
+
+  /* Nascondi e naviga: fade-out verso il basso prima di nascondere */
+  #a2k-meet-ui.a2k-meet-ui-hiding {
+    opacity: 0 !important;
+    transform: translateY(100%) !important;
+  }
+
+  /* Top bar sempre visibile al bordo superiore (nessun overflow verso l'alto) */
+  #a2k-meet-ui .call-top-bar {
+    margin: 0;
+    padding: 10px 12px 10px;
+    padding-top: calc(10px + env(safe-area-inset-top, 0));
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .call-top-bar {
+    background: linear-gradient(to bottom, rgba(2, 6, 23, 0.92), rgba(2, 6, 23, 0.6));
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  #a2k-meet-ui .call-inner {
+    flex: 1 1 0;
+    min-height: 0;
+    padding: 32px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: auto;
+  }
+
+  #a2k-meet-ui .avatar {
+    width: 120px !important;
+    height: 120px !important;
+  }
+
+  #a2k-meet-ui .controls {
+    margin-top: auto;
+    padding-bottom: 12px;
+  }
+
+  #a2k-meet-ui .a2k-meet-controls-block {
+    padding-bottom: 12px;
+  }
+
+  /* Mobile portrait + video call: nascondi tasto fullscreen (in verticale è già a tutto schermo). iOS: sempre nascosto sopra. */
+  #a2k-meet-ui.a2k-meet-video-active:not(.a2k-meet-mobile-landscape) .a2k-meet-fullscreen-btn {
+    display: none !important;
+  }
+  /* Video call mobile: video riempie tutto lo schermo; top bar in overlay in alto; pulsanti in overlay in basso con sfondo = video */
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .call-inner {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-video-wrap {
+    position: absolute !important;
+    inset: 0 !important;
+    flex: none !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0;
+    z-index: 0;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-remote-video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: 0;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-controls-block {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    margin: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.25));
+    padding: 6px 12px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0));
+    pointer-events: auto;
+    touch-action: manipulation;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-controls-block .controls,
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-controls-block .btn,
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-controls-block .a2k-meet-controls-toggle {
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-controls-block .a2k-meet-controls-inner {
+    pointer-events: auto;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active .a2k-meet-local-preview-outer {
+    z-index: 2;
+    bottom: calc(110px + env(safe-area-inset-bottom, 0));
+    right: 12px;
+  }
+  /* Mobile: flusso orizzontale da desktop = riquadro orizzontale centrato, bande sopra/sotto con sfondo dinamico (colore principale) */
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active.a2k-meet-remote-video-landscape .a2k-meet-video-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: radial-gradient(circle at top left, var(--a2k-meet-primary, #13c98c) 0%, var(--a2k-meet-primary-dark, #0f8f6a) 30%, #111827 70%, #020617 100%) !important;
+    background-size: 200% 200% !important;
+    animation: a2k-meet-bg 8s ease-in-out infinite;
+  }
+  #a2k-meet-ui.a2k-meet-video-active.a2k-meet-remote-video-active.a2k-meet-remote-video-landscape .a2k-meet-remote-video {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+  }
+  /* Solo video attivo senza remoto (preview only): layout compatto */
+  #a2k-meet-ui.a2k-meet-video-active:not(.a2k-meet-remote-video-active) .call-inner {
+    position: relative;
+    padding: 0;
+  }
+  #a2k-meet-ui.a2k-meet-video-active:not(.a2k-meet-remote-video-active) .a2k-meet-video-wrap {
+    border-radius: 15px;
+    flex: 1 1 0;
+    min-height: 0;
+    position: relative;
+    inset: auto;
+  }
+  #a2k-meet-ui .a2k-meet-local-preview-outer {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0));
+    right: 12px;
+  }
+  #a2k-meet-ui .a2k-meet-local-preview-wrap {
+    width: 80px;
+    height: 120px;
+    border-radius: 15px;
+    touch-action: none;
+    cursor: grab;
+  }
+  #a2k-meet-ui .a2k-meet-local-preview-wrap.a2k-local-preview-dragging {
+    cursor: grabbing;
+  }
+}
+
+/* Desktop: pulsanti a larghezza massima ridotti di 4px; Notifications e Ringtones restano sulla stessa riga */
+@media (min-width: 701px) {
+  #a2k-meet-widget #a2k-meet-start,
+  #a2k-meet-widget .a2k-notifications-open-btn,
+  #a2k-meet-widget #a2k-meet-history-btn,
+  #a2k-meet-widget .a2k-widget-hide-btn,
+  #a2k-meet-widget .a2k-widget-hide-btn-notif {
+    width: calc(100% - 4px);
+    max-width: calc(100% - 4px);
+  }
+  #a2k-meet-widget .a2k-widget-notifications-ringtones-row .a2k-notifications-open-btn,
+  #a2k-meet-widget .a2k-widget-notifications-ringtones-row #a2k-meet-history-btn,
+  #a2k-meet-widget .a2k-widget-notifications-ringtones-row .a2k-ringtones-toggle-btn {
+    width: auto;
+    max-width: none;
+    flex: 1;
+    min-width: 0;
+  }
+  #a2k-meet-ui .a2k-meet-controls-block,
+  #a2k-meet-ui .controls {
+    width: calc(100% - 4px);
+  }
+}
+
+/* Mobile in orizzontale: widget a schermo intero, copre totalmente il sito; solo "Nascondi" riporta al sito */
+#a2k-meet-widget.a2k-meet-mobile-landscape {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  height: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  border-radius: 0 !important;
+  z-index: 99999 !important;
+  overflow: hidden !important;
+  padding: 12px 14px !important;
+  padding-top: calc(12px + env(safe-area-inset-top, 0)) !important;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0)) !important;
+  touch-action: manipulation;
+  -ms-touch-action: manipulation;
+  /* Copre tutto: nessun contenuto del sito visibile sotto */
+  isolation: isolate;
+  box-sizing: border-box;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape.open {
+  display: flex !important;
+}
+
+/* Widget in orizzontale: resta in layout verticale (come portrait, schermo non ruotato) */
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-page-home.a2k-widget-page-active {
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 10px 14px 12px !important;
+  padding-top: calc(10px + env(safe-area-inset-top, 0)) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+}
+/* Layout verticale: margini e dimensioni come portrait */
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-widget-title {
+  margin: 0 0 4px 0 !important;
+  font-size: 1rem !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-widget-tagline {
+  margin: 0 0 6px 0 !important;
+  font-size: 11px !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-meet-input-wrap {
+  margin: 0 0 6px 0 !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content #a2k-meet-start {
+  margin: 0 0 4px 0 !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content #a2k-meet-error {
+  margin: 0 !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-widget-status-label {
+  margin: 4px 0 4px 0 !important;
+  font-size: 12px !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-widget-status-btns {
+  margin: 0 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-widget-notifications-ringtones-row {
+  margin: 0 0 8px 0 !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-widget-notifications-ringtones-row .a2k-notifications-open-btn,
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-widget-notifications-ringtones-row #a2k-meet-history-btn,
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-widget-notifications-ringtones-row .a2k-ringtones-toggle-btn {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-custom-ringtones-wrap {
+  margin: 0 0 8px 0 !important;
+}
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-home-content .a2k-widget-description {
+  margin: 0 !important;
+  font-size: 10px !important;
+  line-height: 1.4 !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+  flex: 1 1 0 !important;
+}
+/* Footer "Nascondi" in basso */
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-page-home .a2k-widget-footer {
+  margin: 12px 0 0 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+}
+/* Pagina Notifiche in landscape: stessa area utile, niente layout a colonne */
+#a2k-meet-widget.a2k-meet-mobile-landscape .a2k-widget-page-notifications.a2k-widget-page-active {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Call UI in orizzontale su mobile: riempie tutto lo schermo, nessuna striscia di browser visibile */
+#a2k-meet-ui.a2k-meet-mobile-landscape {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  z-index: 99999 !important;
+  touch-action: manipulation !important;
+  -ms-touch-action: manipulation !important;
+  isolation: isolate !important;
+  box-sizing: border-box !important;
+  background: radial-gradient(circle at top left, var(--a2k-meet-primary, #13c98c) 0%, var(--a2k-meet-primary-dark, #0f8f6a) 30%, #111827 70%, #020617 100%) !important;
+  background-size: 200% 200% !important;
+  animation: a2k-meet-bg 8s ease-in-out infinite;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.open {
+  display: flex !important;
+}
+/* Chiamata solo vocale in landscape: layout verticale come portrait */
+#a2k-meet-ui.a2k-meet-mobile-landscape:not(.a2k-meet-remote-video-active) .call-inner {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  padding: 12px 12px 0 !important;
+  padding-top: calc(12px + env(safe-area-inset-top, 0)) !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape:not(.a2k-meet-remote-video-active) .call-inner .avatar,
+#a2k-meet-ui.a2k-meet-mobile-landscape:not(.a2k-meet-remote-video-active) .call-inner .username,
+#a2k-meet-ui.a2k-meet-mobile-landscape:not(.a2k-meet-remote-video-active) .call-inner .status,
+#a2k-meet-ui.a2k-meet-mobile-landscape:not(.a2k-meet-remote-video-active) .call-inner .a2k-meet-watermark,
+#a2k-meet-ui.a2k-meet-mobile-landscape:not(.a2k-meet-remote-video-active) .call-inner .duration {
+  justify-self: unset !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+}
+/* Video call in landscape: top bar nascosta; sinistra = avatar, nome, "in call", logo, slogan, timer, pulsanti; destra = video */
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active .call-inner {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: grid !important;
+  grid-template-columns: minmax(140px, 28vw) 1fr !important;
+  grid-template-rows: auto auto auto auto auto auto 1fr auto !important;
+  align-content: start !important;
+  gap: 0 12px !important;
+  padding: 12px 0 0 12px !important;
+  padding-top: calc(12px + env(safe-area-inset-top, 0)) !important;
+  padding-right: 0 !important;
+}
+/* Colonna sinistra: elementi centrati */
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .avatar {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  width: 72px !important;
+  height: 72px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 8px !important;
+  justify-self: center !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .username {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  font-size: 15px !important;
+  margin-bottom: 4px !important;
+  justify-self: center !important;
+  text-align: center !important;
+  word-break: break-word !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .status {
+  grid-column: 1 !important;
+  grid-row: 3 !important;
+  font-size: 12px !important;
+  margin-bottom: 6px !important;
+  justify-self: center !important;
+  text-align: center !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .a2k-meet-watermark {
+  grid-column: 1 !important;
+  grid-row: 4 !important;
+  margin: 0 0 4px 0 !important;
+  justify-self: center !important;
+  text-align: center !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .a2k-meet-watermark-inner {
+  text-align: center !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .a2k-meet-watermark-title {
+  font-size: 0.9rem !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .a2k-meet-watermark-by,
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .a2k-meet-watermark-slogan {
+  font-size: 0.6rem !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .duration {
+  grid-column: 1 !important;
+  grid-row: 5 !important;
+  font-size: 13px !important;
+  margin-bottom: 0 !important;
+  justify-self: center !important;
+  text-align: center !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active .avatar,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active .username,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active .status,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active .a2k-meet-watermark,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active .duration {
+  display: block !important;
+}
+/* Riquadro video solo quando c'è flusso video in ingresso; dimensioni standard orizzontali (16:9) */
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .a2k-meet-video-wrap {
+  display: none !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active .call-inner .a2k-meet-video-wrap {
+  grid-column: 2 !important;
+  grid-row: 1 / 8 !important;
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  aspect-ratio: 16 / 9 !important;
+  max-height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #0d0d0d !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+/* Flusso orizzontale: riempie tutto il rettangolo */
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-landscape .a2k-meet-remote-video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 12px !important;
+}
+/* Flusso verticale: resta verticale dentro il rettangolo */
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-portrait .a2k-meet-video-wrap {
+  background: radial-gradient(ellipse at 50% 50%, #111827 0%, #0d0d0d 40%, #020617 100%) !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-portrait .a2k-meet-remote-video {
+  width: auto !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  border-radius: 12px !important;
+}
+/* Landscape video: top bar completamente nascosta */
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .call-top-bar {
+  display: none !important;
+}
+/* Pulsanti nella colonna sinistra sotto il timer (non nella top bar) */
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .call-inner .a2k-meet-controls-block {
+  grid-column: 1 !important;
+  grid-row: 6 !important;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 8px 0 0 !important;
+  padding: 8px 0 0 !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  z-index: 2 !important;
+  pointer-events: auto !important;
+  border-radius: 0 !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .a2k-meet-controls-block .a2k-meet-controls-toggle {
+  order: -1 !important;
+  margin: 0 0 4px 0 !important;
+  padding: 0 2px !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  flex-shrink: 0 !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .a2k-meet-controls-block .a2k-meet-controls-toggle:hover {
+  color: #fff !important;
+  text-decoration: underline !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .a2k-meet-controls-block .a2k-meet-controls-inner {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  max-height: none !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .a2k-meet-controls-block .controls {
+  flex-direction: row !important;
+  gap: 6px !important;
+  align-items: center !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .a2k-meet-controls-block .controls .btn {
+  min-width: 40px !important;
+  min-height: 40px !important;
+  width: 40px !important;
+  height: 40px !important;
+  max-width: 40px !important;
+  max-height: 40px !important;
+  padding: 0 !important;
+  border-radius: 10px !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .a2k-meet-controls-block .controls .btn .a2k-meet-icon,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .a2k-meet-controls-block .controls .btn .a2k-meet-hangup-icon {
+  width: 20px !important;
+  height: 20px !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .a2k-meet-controls-block.a2k-meet-controls-hidden .a2k-meet-controls-inner {
+  display: none !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-fullscreen-active) .a2k-meet-controls-block.a2k-meet-controls-hidden .a2k-meet-controls-toggle {
+  margin-bottom: 0 !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active .call-top-bar {
+  min-height: 44px !important;
+  padding-bottom: 10px !important;
+  padding-top: calc(10px + env(safe-area-inset-top, 0)) !important;
+}
+/* Chiamata solo vocale landscape: controlli in basso come portrait (nessuna modifica al blocco) */
+#a2k-meet-ui.a2k-meet-mobile-landscape:not(.a2k-meet-remote-video-active) .call-inner .a2k-meet-controls-block {
+  position: relative !important;
+  margin-top: auto !important;
+}
+/* Landscape voce: nascondi pulsanti Ear mode (si attiva in automatico dopo 1 min); avatar e nome sotto a sinistra */
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .ear-mode,
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .ear-mode-left {
+  display: none !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape:not(.a2k-meet-remote-video-active) .call-inner .avatar,
+#a2k-meet-ui.a2k-meet-mobile-landscape:not(.a2k-meet-remote-video-active) .call-inner .username {
+  display: block !important;
+  justify-self: start !important;
+  align-self: start !important;
+  grid-column: 1 !important;
+  margin-left: 20px !important;
+  margin-top: 12px !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .a2k-meet-hide-ui-row {
+  grid-column: 1 / -1 !important;
+  grid-row: 8 !important;
+  padding: 8px 0 12px !important;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0)) !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape .call-inner .incoming-row {
+  grid-column: 1 !important;
+  grid-row: 6 !important;
+  justify-self: center !important;
+  align-self: start !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active .a2k-meet-local-preview-outer {
+  position: absolute !important;
+  right: calc(12px + env(safe-area-inset-right, 0)) !important;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0)) !important;
+  z-index: 4 !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape .a2k-meet-local-preview-wrap {
+  width: 64px !important;
+  height: 96px !important;
+}
+/* Tasto fullscreen in alto a destra sul video (landscape, non iOS: su iOS resta nascosto) */
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-remote-video-active:not(.a2k-meet-ios) .a2k-meet-fullscreen-btn {
+  display: flex !important;
+  top: 8px !important;
+  right: calc(8px + env(safe-area-inset-right, 0)) !important;
+  z-index: 5 !important;
+}
+/* Fullscreen: video a schermo intero, resto nascosto, pulsanti semi-trasparenti a destra */
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active.a2k-meet-remote-video-active .call-inner .avatar,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active.a2k-meet-remote-video-active .call-inner .username,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active.a2k-meet-remote-video-active .call-inner .status,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active.a2k-meet-remote-video-active .call-inner .a2k-meet-watermark,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active.a2k-meet-remote-video-active .call-inner .duration,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active.a2k-meet-remote-video-active .call-inner .incoming-row,
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active.a2k-meet-remote-video-active .call-inner .a2k-meet-hide-ui-row {
+  display: none !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active.a2k-meet-remote-video-active .call-inner .a2k-meet-video-wrap {
+  position: absolute !important;
+  inset: 0 !important;
+  grid-column: 1 / -1 !important;
+  grid-row: 1 / -1 !important;
+  aspect-ratio: auto !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  opacity: 1 !important;
+  background: #000 !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active.a2k-meet-remote-video-active .call-inner .a2k-meet-remote-video {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active .a2k-meet-controls-block {
+  position: absolute !important;
+  right: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: auto !important;
+  grid-column: unset !important;
+  grid-row: unset !important;
+  padding: 10px 4px 10px 8px !important;
+  padding-right: calc(4px + env(safe-area-inset-right, 0)) !important;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.6), transparent) !important;
+}
+#a2k-meet-ui.a2k-meet-mobile-landscape.a2k-meet-fullscreen-active .a2k-meet-fullscreen-btn {
+  right: calc(72px + env(safe-area-inset-right, 0)) !important;
+}
